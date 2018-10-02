@@ -1,49 +1,29 @@
-const MongoClient = require('mongodb').MongoClient;
-var mongoose = require("mongoose");
+var express = require('express')
+var bodyParser = require("body-parser");
 
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/TodoApp');
+var {mongoose} = require("./db/mongoose");
+var {Todo} = require("./models/todo");
+var {User} = require("./models/user");
 
-var Todo = mongoose.model('Todo', {
-    text: {
-        type: String
-    },
+var app = express();
 
-    completed: {
-        type: Boolean
-    },
+app.use(bodyParser.json())
 
-    completedAt: {
-        type: Number
-    }
+app.post('/todos', (req, res) => {
+    var todo = new Todo({
+        text: req.body.text,
+        completed: req.body.completed,
+        completedAt: req.body.completedAt
+
+    });
+
+    todo.save().then((doc) => {
+        res.send(doc);
+    },(e) => {n
+        res.status(400).send(e); 
+    });
 });
 
-// var newTodo = new Todo({
-//     text: 'Cook Dinner'
-// });
-
-
-// try {
-//     newTodo.save().then(() => {
-//         console.log("Saved todo", doc);
-//     }, (e) => {
-//         console.log('Unable to save Todo')
-//     });
-    
-// } catch (error) {
-//     if(error) console.error(error);
-// }
-
-
-    var otherTodo = new Todo({
-        text: 'Get to work',
-        completed: true,
-        completedAt: 12
-    });
-
-    otherTodo.save().then((doc) => {
-            console.log(JSON.stringify(doc, undefined,2));
-            }, (e) => {
-                console.log('Unable to crete Todo',e);
-    });
-//save new
+app.listen(3000, () => {
+    console.log("Started on port 3000");
+});

@@ -1,7 +1,7 @@
 var express = require('express')
 var fs = require("fs");
 var bodyParser = require("body-parser");
-
+var mongodb = require("mongodb");
 var {mongoose} = require("./db/mongoose");
 var {Todo} = require("./models/todo");
 var {User} = require("./models/user");
@@ -18,6 +18,24 @@ app.get('/todos', (req,res) => {
     });
 });
 
+app.get('/todos/:id', (req,res) => {
+    var id = req.params.id;
+
+    if(!mongodb.ObjectID.isValid(id)) {
+        return res.status(404).send();
+    }
+        Todo.findById(id).then((todo) => {
+            if(!todo) {
+                res.status(404).send();
+            } else {
+                console.log("\n TODO: \n");
+                res.send({todo});
+            }
+        }, (e) => {
+                    res.status(400).send();
+        });
+});
+
 app.post('/todos', (req, res) => {
     var todo = new Todo({
         text: req.body.text,
@@ -27,17 +45,10 @@ app.post('/todos', (req, res) => {
     });
 
     todo.save().then((doc) => {
-           res.send(doc);
-                    
-            var data = JSON.stringify(doc)
-           var r = fs.createReadStream(data);
-           console.log(r)
-           fs.writeFileSync('mynewfile.json', r, function (err) {
-            if (err) throw err;
-            console.log('Saved!');
-          });
-
-
+           res.send(doc);         
+        //     var data = JSON.stringify(doc, undefined, 2)
+        //     console.log('TCL: data', data);
+        //     var r = fs.writeFile(data);
         });  
     },(e) => {
         res.status(400).send(e); 

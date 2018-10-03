@@ -28,6 +28,16 @@ app.post('/todos', (req, res) => {
 
     todo.save().then((doc) => {
            res.send(doc);
+                    
+            var data = JSON.stringify(doc)
+           var r = fs.createReadStream(data);
+           console.log(r)
+           fs.writeFileSync('mynewfile.json', r, function (err) {
+            if (err) throw err;
+            console.log('Saved!');
+          });
+
+
         });  
     },(e) => {
         res.status(400).send(e); 

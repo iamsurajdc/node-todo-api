@@ -61,9 +61,6 @@ app.post('/todos', (req, res) => {
         var id = req.params.id;
        
         var body = _.pick(req.body, ['text','completed']);
-        console.log('TCL: body.completed', body.completed);
-
-        console.log('TCL: _.isBoolean(body.completed', _.isBoolean(body.completed));
         if(!mongodb.ObjectID.isValid(id)) {
             return res.status(404).send();
         }

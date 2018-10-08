@@ -4,16 +4,10 @@ const express = require('express')
 const fs = require("fs");
 const bodyParser = require("body-parser");
 const mongodb = require("mongodb");
-var {
-    mongoose
-} = require("./db/mongoose");
-var {
-    Todo
-} = require("./models/todo");
-var {
-    User
-} = require("./models/user");
-
+var {mongoose} = require("./db/mongoose");
+var {Todo} = require("./models/todo");
+var { User} = require("./models/user");
+var {authenticate} = require("./middleware/authenticate"); 
 var app = express();
 const port = process.env.PORT || 3000;
 
@@ -61,9 +55,7 @@ app.post('/todos', (req, res) => {
 
     todo.save().then((doc) => {
         res.send(doc);
-        //     var data = JSON.stringify(doc, undefined, 2)
-        //     console.log('TCL: data', data);
-        //     var r = fs.writeFile(data);
+
     }).catch((e) => {
         res.status(400).send(e);
     });
@@ -72,7 +64,7 @@ app.post('/todos', (req, res) => {
 app.post('/users', (req, res) => {
     var body = _.pick(req.body, ['email', 'password'])
     var user = new User(body);
-    console.log('TCL: user', user);
+    // console.log('TCL: user', user);
 
     user.save().then(() => {
         return user.generateAuthToken();
@@ -138,6 +130,9 @@ app.delete('/todos/:id', (req, res) => {
     });
 });
 
+app.get('/users/me', authenticate,  (req, res) => {
+    res.send(req.user);
+});
 
 app.listen(3000, () => {
     console.log(`Started on port ${port}`);

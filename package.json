@@ -21,7 +21,8 @@
     "lodash.isboolean": "^3.0.3",
     "mongodb": "^2.2.33",
     "mongoose": "^4.13.17",
-    "validator": "^10.8.0"
+    "validator": "^10.8.0",
+    "xlsx": "^0.14.0"
   },
   "devDependencies": {
     "expect": "^23.6.0",

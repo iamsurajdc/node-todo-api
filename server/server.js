@@ -19,9 +19,7 @@ app.get('/todos', (req, res) => {
             todos
         });
     }, (e) => {
-        res.status(400).send({
-            e
-        })
+        res.status(400).send({e})
     });
 });
 
@@ -139,13 +137,25 @@ app.post('/users/login', (req, res) => {
         var body = _.pick(req.body, ['email', 'password'])        
         User.findByCredentials(body.email, body.password).then((user) => {
                return user.generateAuthToken().then((token) => {
-                    res.header('x-path',token).send(user);    
+                    console.log('TCL: token', token);
+                    res.header('x-auth',token).send(user);    
+                    console.log( ' res.header x-auth token',token);
                 });
         }).catch((e) => {
             res.status(400).send();
         });
 });
 
-app.listen(3000, () => {
+app.delete('/users/me/token', authenticate, (req, res) => {
+
+    req.user.removeToken(req.token).then(() => {
+        console.log('TCL: req.token', req.token);
+        res.status(200).send();
+    }, () => {
+        res.status(400).send();
+    }); 
+});
+
+app.listen(port, () => {
     console.log(`Started on port ${port}`);
 });
